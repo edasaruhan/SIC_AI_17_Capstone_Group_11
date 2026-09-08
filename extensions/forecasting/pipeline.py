@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Mapping, Protocol
+from typing import Iterable, Mapping, Protocol, Sequence
 
 import lightgbm as lgb
 import numpy as np
@@ -37,6 +37,26 @@ FEATURE_COLUMNS = [
     "op_area",
     "center_id",
     "meal_id",
+]
+
+PROMOTION_FEATURE_COLUMNS = FEATURE_COLUMNS + [
+    "price_gap",
+    "promotion_count",
+    "promotion_discount_interaction",
+]
+
+LONG_MEMORY_FEATURE_COLUMNS = FEATURE_COLUMNS + [
+    "num_orders_lag_8",
+    "num_orders_lag_13",
+    "num_orders_roll_mean_8",
+    "num_orders_roll_mean_13",
+    "num_orders_roll_std_8",
+    "num_orders_roll_median_8",
+    "demand_recent_to_long_ratio",
+]
+
+EXPERIMENTAL_FEATURE_COLUMNS = PROMOTION_FEATURE_COLUMNS + [
+    feature for feature in LONG_MEMORY_FEATURE_COLUMNS if feature not in FEATURE_COLUMNS
 ]
 
 CATEGORICAL_FEATURES = [
@@ -183,6 +203,13 @@ def add_static_features(
     result["weekofyear"] = ((result["week"] - 1) % 52) + 1
     result["week_sin"] = np.sin(2 * np.pi * result["weekofyear"] / 52)
     result["week_cos"] = np.cos(2 * np.pi * result["weekofyear"] / 52)
+    result["price_gap"] = result["base_price"] - result["checkout_price"]
+    result["promotion_count"] = (
+        result["emailer_for_promotion"] + result["homepage_featured"]
+    )
+    result["promotion_discount_interaction"] = (
+        result["promotion_count"] * result["discount_ratio"]
+    )
     for column, mapping in category_maps.items():
         result[f"{column}_enc"] = result[column].astype(str).map(mapping).fillna(-1).astype("int32")
     return result
@@ -195,8 +222,27 @@ def add_observed_lag_features(frame: pd.DataFrame) -> pd.DataFrame:
     grouped = result.groupby(["center_id", "meal_id"], sort=False)["num_orders"]
     result["num_orders_lag_1"] = grouped.shift(1)
     result["num_orders_lag_4"] = grouped.shift(4)
+    result["num_orders_lag_8"] = grouped.shift(8)
+    result["num_orders_lag_13"] = grouped.shift(13)
     result["num_orders_roll_mean_4"] = grouped.transform(
         lambda series: series.shift(1).rolling(4).mean()
+    )
+    result["num_orders_roll_mean_8"] = grouped.transform(
+        lambda series: series.shift(1).rolling(8, min_periods=4).mean()
+    )
+    result["num_orders_roll_mean_13"] = grouped.transform(
+        lambda series: series.shift(1).rolling(13, min_periods=4).mean()
+    )
+    result["num_orders_roll_std_8"] = grouped.transform(
+        lambda series: series.shift(1).rolling(8, min_periods=4).std(ddof=0)
+    )
+    result["num_orders_roll_median_8"] = grouped.transform(
+        lambda series: series.shift(1).rolling(8, min_periods=4).median()
+    )
+    result["demand_recent_to_long_ratio"] = np.where(
+        result["num_orders_roll_mean_13"].gt(0),
+        result["num_orders_roll_mean_4"] / result["num_orders_roll_mean_13"],
+        np.nan,
     )
     result["log_num_orders"] = np.log1p(result["num_orders"])
     return result
@@ -245,15 +291,38 @@ def add_history_features(batch: pd.DataFrame, histories: History) -> pd.DataFram
     result = batch.copy()
     lag_1: list[float] = []
     lag_4: list[float] = []
+    lag_8: list[float] = []
+    lag_13: list[float] = []
     rolling_4: list[float] = []
+    rolling_8: list[float] = []
+    rolling_13: list[float] = []
+    rolling_std_8: list[float] = []
+    rolling_median_8: list[float] = []
     for row in result.itertuples(index=False):
         history = histories.get((int(row.center_id), int(row.meal_id)), [])
         lag_1.append(history[-1] if len(history) >= 1 else np.nan)
         lag_4.append(history[-4] if len(history) >= 4 else np.nan)
+        lag_8.append(history[-8] if len(history) >= 8 else np.nan)
+        lag_13.append(history[-13] if len(history) >= 13 else np.nan)
         rolling_4.append(float(np.mean(history[-4:])) if len(history) >= 4 else np.nan)
+        rolling_8.append(float(np.mean(history[-8:])) if len(history) >= 4 else np.nan)
+        rolling_13.append(float(np.mean(history[-13:])) if len(history) >= 4 else np.nan)
+        rolling_std_8.append(float(np.std(history[-8:])) if len(history) >= 4 else np.nan)
+        rolling_median_8.append(float(np.median(history[-8:])) if len(history) >= 4 else np.nan)
     result["num_orders_lag_1"] = lag_1
     result["num_orders_lag_4"] = lag_4
+    result["num_orders_lag_8"] = lag_8
+    result["num_orders_lag_13"] = lag_13
     result["num_orders_roll_mean_4"] = rolling_4
+    result["num_orders_roll_mean_8"] = rolling_8
+    result["num_orders_roll_mean_13"] = rolling_13
+    result["num_orders_roll_std_8"] = rolling_std_8
+    result["num_orders_roll_median_8"] = rolling_median_8
+    result["demand_recent_to_long_ratio"] = np.where(
+        result["num_orders_roll_mean_13"].gt(0),
+        result["num_orders_roll_mean_4"] / result["num_orders_roll_mean_13"],
+        np.nan,
+    )
     return result
 
 
@@ -269,6 +338,7 @@ def recursive_predict(
     model: Predictor,
     future_static: pd.DataFrame,
     observed_history: pd.DataFrame,
+    feature_columns: Sequence[str] = FEATURE_COLUMNS,
 ) -> pd.DataFrame:
     if future_static.empty:
         raise ValueError("Future dataset is empty")
@@ -278,7 +348,7 @@ def recursive_predict(
         batch = future_static[future_static["week"] == week].copy()
         batch = batch.sort_values(["center_id", "meal_id", "id"]).reset_index(drop=True)
         featured = add_history_features(batch, histories)
-        prediction_log = np.asarray(model.predict(featured[FEATURE_COLUMNS]), dtype=float)
+        prediction_log = np.asarray(model.predict(featured[list(feature_columns)]), dtype=float)
         predictions = np.clip(np.expm1(prediction_log), 0, None)
         if not np.isfinite(predictions).all():
             raise ValueError(f"Non-finite predictions produced for week {week}")
@@ -320,6 +390,7 @@ def train_point_model(
     train_observed: pd.DataFrame,
     num_boost_round: int = 1360,
     params: Mapping[str, object] | None = None,
+    feature_columns: Sequence[str] = FEATURE_COLUMNS,
 ) -> lgb.Booster:
     if num_boost_round <= 0:
         raise ValueError("num_boost_round must be positive")
@@ -327,7 +398,7 @@ def train_point_model(
     if params:
         training_params.update(params)
     dataset = lgb.Dataset(
-        train_observed[FEATURE_COLUMNS],
+        train_observed[list(feature_columns)],
         label=train_observed["log_num_orders"],
         categorical_feature=CATEGORICAL_FEATURES,
         free_raw_data=False,

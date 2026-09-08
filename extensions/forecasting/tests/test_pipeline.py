@@ -21,6 +21,8 @@ from pipeline import (  # noqa: E402
     regression_metrics,
     update_history,
 )
+from error_analysis import add_analysis_slices, summarize_slice  # noqa: E402
+from hybrid_experiment import hybrid_predictions  # noqa: E402
 
 
 class PipelineTests(unittest.TestCase):
@@ -64,6 +66,36 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(features_6.loc[0, "num_orders_lag_4"], 20.0)
         self.assertEqual(features_6.loc[0, "num_orders_roll_mean_4"], 35.0)
 
+    def test_long_history_features_match_observed_features(self) -> None:
+        observed = pd.DataFrame(
+            {
+                "id": list(range(1, 14)),
+                "week": list(range(1, 14)),
+                "center_id": [10] * 13,
+                "meal_id": [20] * 13,
+                "num_orders": [float(value) for value in range(1, 14)],
+            }
+        )
+        future = pd.DataFrame({"id": [14], "week": [14], "center_id": [10], "meal_id": [20]})
+        recursive = add_history_features(future, make_history(observed))
+        expected = {
+            "num_orders_lag_8": 6.0,
+            "num_orders_lag_13": 1.0,
+            "num_orders_roll_mean_8": 9.5,
+            "num_orders_roll_mean_13": 7.0,
+            "num_orders_roll_median_8": 9.5,
+        }
+        extended = add_observed_lag_features(
+            pd.concat([observed, future.assign(num_orders=14.0)], ignore_index=True)
+        ).iloc[-1]
+        for column, value in expected.items():
+            self.assertAlmostEqual(recursive.loc[0, column], value)
+            self.assertAlmostEqual(extended[column], value)
+        self.assertAlmostEqual(
+            recursive.loc[0, "num_orders_roll_std_8"],
+            extended["num_orders_roll_std_8"],
+        )
+
     def test_submission_preserves_sample_order(self) -> None:
         sample = pd.DataFrame({"id": [3, 1, 2], "num_orders": [0, 0, 0]})
         predictions = pd.DataFrame({"id": [1, 2, 3], "num_orders": [11.0, 12.0, 13.0]})
@@ -95,6 +127,35 @@ class PipelineTests(unittest.TestCase):
     def test_metrics_match_known_values(self) -> None:
         metrics = regression_metrics(np.array([10.0, 20.0]), np.array([10.0, 20.0]))
         self.assertEqual(metrics, {"rmsle": 0.0, "mae": 0.0})
+
+    def test_error_summary_reports_direction_and_rate(self) -> None:
+        frame = pd.DataFrame({"actual": [10.0, 20.0], "predicted": [5.0, 30.0]})
+        summary = summarize_slice(frame)
+        self.assertEqual(summary["rows"], 2)
+        self.assertEqual(summary["mae"], 7.5)
+        self.assertEqual(summary["mean_bias"], 2.5)
+        self.assertEqual(summary["underforecast_rate"], 0.5)
+
+    def test_analysis_slice_labels_promotions(self) -> None:
+        frame = pd.DataFrame(
+            {
+                "actual": [100.0],
+                "predicted": [90.0],
+                "emailer_for_promotion": [1],
+                "homepage_featured": [1],
+                "discount_ratio": [0.2],
+            }
+        )
+        result = add_analysis_slices(frame)
+        self.assertEqual(result.loc[0, "promotion_state"], "email_and_homepage")
+        self.assertEqual(str(result.loc[0, "demand_bucket"]), "51-150")
+        self.assertEqual(str(result.loc[0, "discount_bucket"]), "15-30%")
+
+    def test_hybrid_keeps_base_below_threshold_and_blends_above(self) -> None:
+        base = np.array([40.0, 200.0])
+        long_memory = np.array([50.0, 100.0])
+        result = hybrid_predictions(base, long_memory, threshold=100.0, long_memory_weight=0.5)
+        np.testing.assert_allclose(result, np.array([40.0, 150.0]))
 
 
 if __name__ == "__main__":
