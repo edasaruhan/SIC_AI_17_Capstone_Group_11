@@ -2,9 +2,12 @@ import pandas as pd
 import numpy as np
 import lightgbm as lgb
 import pickle, json, time
+from pathlib import Path
 
-df = pd.read_parquet('../data/features.parquet')
-with open('../data/split_config.pkl', 'rb') as f:
+DATA_DIR = Path(__file__).resolve().parents[1] / 'data'
+
+df = pd.read_parquet(DATA_DIR / 'features.parquet')
+with open(DATA_DIR / 'split_config.pkl', 'rb') as f:
     cfg = pickle.load(f)
 feature_cols = cfg['feature_cols']
 cat_features = cfg['cat_features']
@@ -80,6 +83,6 @@ results.append(train_quantile_set('genis band (alpha=.05/.5/.95, baseline params
 # 3) Kalibrasyon + tuned hiperparametreler birlikte
 results.append(train_quantile_set('genis band + tuned params (alpha=.05/.5/.95)', [0.05, 0.5, 0.95], TUNED_PARAMS))
 
-with open('../data/quantile_calibration_results.json', 'w') as f:
+with open(DATA_DIR / 'quantile_calibration_results.json', 'w') as f:
     json.dump(results, f, indent=2)
 print('Kaydedildi: quantile_calibration_results.json')

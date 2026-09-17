@@ -26,6 +26,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    repo_root = Path(__file__).resolve().parents[2]
     prepared = prepare_data(args.data_dir)
     print(
         f"Training on weeks {int(prepared.train_observed.week.min())}-"
@@ -80,7 +81,11 @@ def main() -> None:
             "num_orders_lag_4",
             "num_orders_roll_mean_4",
         ],
-        "submission_path": str(args.output.resolve()),
+        "submission_path": (
+            args.output.resolve().relative_to(repo_root).as_posix()
+            if args.output.resolve().is_relative_to(repo_root)
+            else str(args.output.resolve())
+        ),
     }
     args.manifest.parent.mkdir(parents=True, exist_ok=True)
     args.manifest.write_text(json.dumps(manifest, indent=2), encoding="utf-8")

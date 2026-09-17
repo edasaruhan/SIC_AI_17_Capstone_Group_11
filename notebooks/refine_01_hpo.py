@@ -4,12 +4,15 @@ import lightgbm as lgb
 import optuna
 from sklearn.metrics import mean_absolute_error
 import pickle, json, time
+from pathlib import Path
 
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
-df = pd.read_parquet('../data/features.parquet')
+DATA_DIR = Path(__file__).resolve().parents[1] / 'data'
 
-with open('../data/split_config.pkl', 'rb') as f:
+df = pd.read_parquet(DATA_DIR / 'features.parquet')
+
+with open(DATA_DIR / 'split_config.pkl', 'rb') as f:
     cfg = pickle.load(f)
 feature_cols = cfg['feature_cols']
 cat_features = cfg['cat_features']
@@ -80,7 +83,7 @@ baseline_inner_model = lgb.train(
 )
 print(f'Baseline parametrelerle ic-validasyon RMSE: {baseline_inner_model.best_score["valid_0"]["rmse"]:.5f}')
 
-with open('../data/optuna_best_params.json', 'w') as f:
+with open(DATA_DIR / 'optuna_best_params.json', 'w') as f:
     json.dump({
         'best_params': study.best_params,
         'best_inner_valid_rmse': study.best_value,

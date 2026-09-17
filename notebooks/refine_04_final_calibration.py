@@ -2,9 +2,12 @@ import pandas as pd
 import numpy as np
 import lightgbm as lgb
 import pickle, json, time
+from pathlib import Path
 
-df = pd.read_parquet('../data/features.parquet')
-with open('../data/split_config.pkl', 'rb') as f:
+DATA_DIR = Path(__file__).resolve().parents[1] / 'data'
+
+df = pd.read_parquet(DATA_DIR / 'features.parquet')
+with open(DATA_DIR / 'split_config.pkl', 'rb') as f:
     cfg = pickle.load(f)
 feature_cols = cfg['feature_cols']
 cat_features = cfg['cat_features']
@@ -43,7 +46,7 @@ def train_quantile_set(name, alphas, base_params):
         pred_log = model.predict(test_df[feature_cols], num_iteration=model.best_iteration)
         preds[a] = np.clip(np.expm1(pred_log), 0, None)
         best_iters[a] = int(model.best_iteration)
-        model.save_model(f'../data/quantile_final_p{int(a*100)}.txt')
+        model.save_model(str(DATA_DIR / f'quantile_final_p{int(a*100)}.txt'))
 
     stacked = np.column_stack([preds[a] for a in alphas])
     stacked_sorted = np.sort(stacked, axis=1)
@@ -67,9 +70,9 @@ def train_quantile_set(name, alphas, base_params):
 
 result, preds = train_quantile_set('kalibre edilmis final (alpha=.08/.5/.92, tuned params)', [0.08, 0.5, 0.92], TUNED_PARAMS)
 
-with open('../data/quantile_final_calibrated.json', 'w') as f:
+with open(DATA_DIR / 'quantile_final_calibrated.json', 'w') as f:
     json.dump(result, f, indent=2)
 
 test_out = test_df.assign(pred_p_lo=preds[0], pred_p50=preds[1], pred_p_hi=preds[2])
-test_out.to_parquet('../data/test_with_final_quantile_pred.parquet', index=False)
+test_out.to_parquet(DATA_DIR / 'test_with_final_quantile_pred.parquet', index=False)
 print('Kaydedildi.')

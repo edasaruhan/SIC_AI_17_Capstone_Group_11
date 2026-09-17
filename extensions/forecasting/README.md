@@ -2,6 +2,8 @@
 
 This folder adds leakage-aware evaluation and real test-set submission tooling without changing the original notebooks, reports, model files, or result files.
 
+Install the complete project environment from the repository root with `python -m pip install -r requirements.txt`. This folder's `requirements.txt` contains only the dependencies required by the extension itself.
+
 ## What this adds
 
 - Expanding-window walk-forward validation over three 10-week folds.
@@ -82,6 +84,8 @@ python extensions/forecasting/build_submission.py
 ```
 
 Generated files are placed under `extensions/forecasting/outputs/` and are intentionally ignored by Git. The default submission uses the tuned LightGBM parameters already reported by the project and 1,360 boosting rounds.
+
+The verified final delivery is committed separately as `submissions/final_submission.csv`, with its production record in `submissions/final_submission_manifest.json` and the trained full-data model in `data/final_submission_lgb_model.txt`.
 
 ## Important interpretation
 

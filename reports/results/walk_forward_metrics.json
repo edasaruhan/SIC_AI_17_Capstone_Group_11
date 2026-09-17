@@ -1,0 +1,300 @@
+{
+  "created_at_utc": "2026-09-17T16:18:08.354244+00:00",
+  "evaluation": "expanding-window recursive multi-week backtest",
+  "num_boost_round": 1360,
+  "horizon_weeks": 10,
+  "folds": [
+    {
+      "train_end_week": 115,
+      "validation_start_week": 116,
+      "validation_end_week": 125,
+      "train_rows": 358073,
+      "validation_rows": 32834,
+      "rmsle": 0.49677943487998416,
+      "mae": 71.87467387755927,
+      "persistence_rmsle": 0.8278891664252211,
+      "persistence_mae": 132.8898093439727,
+      "rmsle_improvement_vs_persistence_pct": 39.99445154898574,
+      "weekly_metrics": [
+        {
+          "week": 116,
+          "rows": 3275,
+          "rmsle": 0.46843585453245723,
+          "mae": 71.16698258454778,
+          "persistence_rmsle": 0.6212063867885456,
+          "persistence_mae": 80.57832061068703
+        },
+        {
+          "week": 117,
+          "rows": 3290,
+          "rmsle": 0.4819903189507471,
+          "mae": 71.34785935021843,
+          "persistence_rmsle": 0.7644116404976233,
+          "persistence_mae": 119.88905775075987
+        },
+        {
+          "week": 118,
+          "rows": 3278,
+          "rmsle": 0.48623016303924294,
+          "mae": 69.86019490043887,
+          "persistence_rmsle": 0.8158660117096834,
+          "persistence_mae": 126.61622940817571
+        },
+        {
+          "week": 119,
+          "rows": 3221,
+          "rmsle": 0.49991198651170454,
+          "mae": 70.75944649285182,
+          "persistence_rmsle": 0.810096438722002,
+          "persistence_mae": 140.3570319776467
+        },
+        {
+          "week": 120,
+          "rows": 3261,
+          "rmsle": 0.4864055572799288,
+          "mae": 62.71243076957734,
+          "persistence_rmsle": 0.8059235621579607,
+          "persistence_mae": 130.08157007053052
+        },
+        {
+          "week": 121,
+          "rows": 3298,
+          "rmsle": 0.46875117293873336,
+          "mae": 75.33116864634444,
+          "persistence_rmsle": 0.7561934670924172,
+          "persistence_mae": 132.3208004851425
+        },
+        {
+          "week": 122,
+          "rows": 3359,
+          "rmsle": 0.5159496900760068,
+          "mae": 86.37472166733157,
+          "persistence_rmsle": 0.9850420421716926,
+          "persistence_mae": 161.29681452813338
+        },
+        {
+          "week": 123,
+          "rows": 3331,
+          "rmsle": 0.5643239848828202,
+          "mae": 81.42010943782795,
+          "persistence_rmsle": 1.0092738571780486,
+          "persistence_mae": 170.47853497448213
+        },
+        {
+          "week": 124,
+          "rows": 3274,
+          "rmsle": 0.48976662690630157,
+          "mae": 65.06768381852481,
+          "persistence_rmsle": 0.8270858593241417,
+          "persistence_mae": 142.69639584605986
+        },
+        {
+          "week": 125,
+          "rows": 3247,
+          "rmsle": 0.49751264569486864,
+          "mae": 64.0242434422534,
+          "persistence_rmsle": 0.8092667865135476,
+          "persistence_mae": 123.3135201724669
+        }
+      ]
+    },
+    {
+      "train_end_week": 125,
+      "validation_start_week": 126,
+      "validation_end_week": 135,
+      "train_rows": 390907,
+      "validation_rows": 32820,
+      "rmsle": 0.49645930613900247,
+      "mae": 82.69990940136823,
+      "persistence_rmsle": 0.8334427848225311,
+      "persistence_mae": 137.3518281535649,
+      "rmsle_improvement_vs_persistence_pct": 40.43270693803944,
+      "weekly_metrics": [
+        {
+          "week": 126,
+          "rows": 3254,
+          "rmsle": 0.4379492657230128,
+          "mae": 62.06759685746299,
+          "persistence_rmsle": 0.7061457720347258,
+          "persistence_mae": 89.73110018438844
+        },
+        {
+          "week": 127,
+          "rows": 3255,
+          "rmsle": 0.43819705432656736,
+          "mae": 57.777658640668704,
+          "persistence_rmsle": 0.714374899739133,
+          "persistence_mae": 89.73978494623655
+        },
+        {
+          "week": 128,
+          "rows": 3278,
+          "rmsle": 0.48309093127414154,
+          "mae": 81.69379063714626,
+          "persistence_rmsle": 0.7661096340144418,
+          "persistence_mae": 144.2837095790116
+        },
+        {
+          "week": 129,
+          "rows": 3291,
+          "rmsle": 0.4936432760760895,
+          "mae": 73.49768435255658,
+          "persistence_rmsle": 0.8192477443966005,
+          "persistence_mae": 140.0802187784868
+        },
+        {
+          "week": 130,
+          "rows": 3258,
+          "rmsle": 0.500227668195933,
+          "mae": 90.12670318640444,
+          "persistence_rmsle": 0.8858107577297326,
+          "persistence_mae": 154.42019643953347
+        },
+        {
+          "week": 131,
+          "rows": 3293,
+          "rmsle": 0.5152875862217119,
+          "mae": 87.300979766971,
+          "persistence_rmsle": 0.8804385535391842,
+          "persistence_mae": 146.12966899483754
+        },
+        {
+          "week": 132,
+          "rows": 3276,
+          "rmsle": 0.4960968574280828,
+          "mae": 98.5520128766359,
+          "persistence_rmsle": 0.8803689203386927,
+          "persistence_mae": 164.19444444444446
+        },
+        {
+          "week": 133,
+          "rows": 3324,
+          "rmsle": 0.5033149949676743,
+          "mae": 77.56775907298932,
+          "persistence_rmsle": 0.8704003020971891,
+          "persistence_mae": 141.1991576413959
+        },
+        {
+          "week": 134,
+          "rows": 3330,
+          "rmsle": 0.5173056180258995,
+          "mae": 107.27079287713548,
+          "persistence_rmsle": 0.9026377887522561,
+          "persistence_mae": 163.36786786786786
+        },
+        {
+          "week": 135,
+          "rows": 3261,
+          "rmsle": 0.5658307573115812,
+          "mae": 90.61188948581338,
+          "persistence_rmsle": 0.8758723683912012,
+          "persistence_mae": 139.30236123888378
+        }
+      ]
+    },
+    {
+      "train_end_week": 135,
+      "validation_start_week": 136,
+      "validation_end_week": 145,
+      "train_rows": 423727,
+      "validation_rows": 32821,
+      "rmsle": 0.5017561909750048,
+      "mae": 70.52473907521114,
+      "persistence_rmsle": 0.7665816617843979,
+      "persistence_mae": 110.31814996496146,
+      "rmsle_improvement_vs_persistence_pct": 34.546283065648865,
+      "weekly_metrics": [
+        {
+          "week": 136,
+          "rows": 3273,
+          "rmsle": 0.44219980516368257,
+          "mae": 60.45635575700502,
+          "persistence_rmsle": 0.6424327467258205,
+          "persistence_mae": 81.78582340360525
+        },
+        {
+          "week": 137,
+          "rows": 3283,
+          "rmsle": 0.48873037421122834,
+          "mae": 65.08526640774343,
+          "persistence_rmsle": 0.7551524222368755,
+          "persistence_mae": 103.31465123362779
+        },
+        {
+          "week": 138,
+          "rows": 3278,
+          "rmsle": 0.5241031569185121,
+          "mae": 60.095754029947415,
+          "persistence_rmsle": 0.8297664979444179,
+          "persistence_mae": 117.27242220866383
+        },
+        {
+          "week": 139,
+          "rows": 3279,
+          "rmsle": 0.5248345538661262,
+          "mae": 74.55375684535588,
+          "persistence_rmsle": 0.7821687574205723,
+          "persistence_mae": 110.42970417810308
+        },
+        {
+          "week": 140,
+          "rows": 3332,
+          "rmsle": 0.5051947003417889,
+          "mae": 78.2010306115006,
+          "persistence_rmsle": 0.7501248945636362,
+          "persistence_mae": 111.18367346938776
+        },
+        {
+          "week": 141,
+          "rows": 3263,
+          "rmsle": 0.5028004092832826,
+          "mae": 74.87020094625085,
+          "persistence_rmsle": 0.745831745338422,
+          "persistence_mae": 117.2975789151088
+        },
+        {
+          "week": 142,
+          "rows": 3238,
+          "rmsle": 0.49180606773312524,
+          "mae": 68.66107302734747,
+          "persistence_rmsle": 0.7407687082202213,
+          "persistence_mae": 110.83909820877085
+        },
+        {
+          "week": 143,
+          "rows": 3305,
+          "rmsle": 0.5083959488000592,
+          "mae": 70.60058279655868,
+          "persistence_rmsle": 0.8020948487435217,
+          "persistence_mae": 113.42904689863843
+        },
+        {
+          "week": 144,
+          "rows": 3302,
+          "rmsle": 0.5091858671842908,
+          "mae": 82.93967075381265,
+          "persistence_rmsle": 0.8160069646654061,
+          "persistence_mae": 123.13991520290733
+        },
+        {
+          "week": 145,
+          "rows": 3268,
+          "rmsle": 0.5148822621293757,
+          "mae": 69.55160821686442,
+          "persistence_rmsle": 0.7841438256209134,
+          "persistence_mae": 114.37362301101591
+        }
+      ]
+    }
+  ],
+  "mean_rmsle": 0.4983316439979972,
+  "std_rmsle": 0.00242504461828366,
+  "mean_mae": 75.03310745137954,
+  "mean_persistence_rmsle": 0.8093045376773834,
+  "mean_rmsle_improvement_vs_persistence_pct": 38.32448051755801,
+  "notes": [
+    "Each fold trains only on weeks at or before its cutoff.",
+    "Validation lag features use prior predictions, not future observed targets.",
+    "The external Kaggle test.csv is not used during model selection."
+  ]
+}

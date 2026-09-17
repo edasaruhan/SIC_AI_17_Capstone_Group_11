@@ -3,8 +3,11 @@ import numpy as np
 import lightgbm as lgb
 from sklearn.metrics import mean_absolute_error
 import pickle
+from pathlib import Path
 
-df = pd.read_parquet('../data/features.parquet')
+DATA_DIR = Path(__file__).resolve().parents[1] / 'data'
+
+df = pd.read_parquet(DATA_DIR / 'features.parquet')
 
 SPLIT_WEEK = df['week'].max() - 10  # 135
 
@@ -57,10 +60,10 @@ print(f'RMSLE: {rmsle:.4f}')
 print(f'MAE  : {mae:.2f}')
 print(f'Best iteration: {baseline_model.best_iteration}')
 
-baseline_model.save_model('../data/baseline_lgb_model.txt')
-with open('../data/split_config.pkl', 'wb') as f:
+baseline_model.save_model(str(DATA_DIR / 'baseline_lgb_model.txt'))
+with open(DATA_DIR / 'split_config.pkl', 'wb') as f:
     pickle.dump({'feature_cols': feature_cols, 'cat_features': cat_features,
                  'target_col': target_col, 'split_week': SPLIT_WEEK}, f)
 test_df = test_df.assign(pred_num_orders=pred_orders)
-test_df.to_parquet('../data/test_with_baseline_pred.parquet', index=False)
+test_df.to_parquet(DATA_DIR / 'test_with_baseline_pred.parquet', index=False)
 print('Kaydedildi.')

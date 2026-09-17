@@ -3,9 +3,12 @@ import numpy as np
 import lightgbm as lgb
 from sklearn.metrics import mean_absolute_error
 import pickle, json
+from pathlib import Path
 
-df = pd.read_parquet('../data/features.parquet')
-with open('../data/split_config.pkl', 'rb') as f:
+DATA_DIR = Path(__file__).resolve().parents[1] / 'data'
+
+df = pd.read_parquet(DATA_DIR / 'features.parquet')
+with open(DATA_DIR / 'split_config.pkl', 'rb') as f:
     cfg = pickle.load(f)
 feature_cols = cfg['feature_cols']
 cat_features = cfg['cat_features']
@@ -71,7 +74,7 @@ improvement_mae = (baseline_result['mae_test'] - tuned_result['mae_test']) / bas
 print(f'\nRMSLE iyilesme: %{improvement_rmsle:.2f}')
 print(f'MAE iyilesme: %{improvement_mae:.2f}')
 
-with open('../data/hpo_final_comparison.json', 'w') as f:
+with open(DATA_DIR / 'hpo_final_comparison.json', 'w') as f:
     json.dump({
         'baseline': baseline_result,
         'tuned': tuned_result,
@@ -80,7 +83,7 @@ with open('../data/hpo_final_comparison.json', 'w') as f:
         'tuned_params': TUNED_PARAMS,
     }, f, indent=2)
 
-tuned_model.save_model('../data/tuned_lgb_model.txt')
+tuned_model.save_model(str(DATA_DIR / 'tuned_lgb_model.txt'))
 test_df = test_df.assign(pred_baseline=baseline_pred, pred_tuned=tuned_pred)
-test_df.to_parquet('../data/test_with_tuned_pred.parquet', index=False)
+test_df.to_parquet(DATA_DIR / 'test_with_tuned_pred.parquet', index=False)
 print('Kaydedildi.')

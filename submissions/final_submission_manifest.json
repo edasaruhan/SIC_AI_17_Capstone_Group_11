@@ -1,0 +1,95 @@
+{
+  "created_at_utc": "2026-09-17T16:19:05.368980+00:00",
+  "training_week_range": [
+    1,
+    145
+  ],
+  "test_week_range": [
+    146,
+    155
+  ],
+  "training_rows": 456548,
+  "submission_rows": 32573,
+  "num_boost_round": 1360,
+  "prediction_min": 12.88200791763531,
+  "prediction_mean": 234.45105658819227,
+  "prediction_max": 7050.183584738703,
+  "weekly_prediction_summary": [
+    {
+      "week": 146,
+      "rows": 3240,
+      "prediction_min": 15.516135425749411,
+      "prediction_mean": 196.40515602095388,
+      "prediction_max": 2576.4643432806765
+    },
+    {
+      "week": 147,
+      "rows": 3271,
+      "prediction_min": 14.971520016235957,
+      "prediction_mean": 228.4525253382269,
+      "prediction_max": 2520.3720271696966
+    },
+    {
+      "week": 148,
+      "rows": 3332,
+      "prediction_min": 15.047602885892093,
+      "prediction_mean": 209.3629128289884,
+      "prediction_max": 2522.3772699525234
+    },
+    {
+      "week": 149,
+      "rows": 3313,
+      "prediction_min": 14.8191590644752,
+      "prediction_mean": 188.93061614971475,
+      "prediction_max": 2440.8456505690333
+    },
+    {
+      "week": 150,
+      "rows": 3277,
+      "prediction_min": 14.207610013163041,
+      "prediction_mean": 241.53931155553025,
+      "prediction_max": 4071.4889112254086
+    },
+    {
+      "week": 151,
+      "rows": 3224,
+      "prediction_min": 13.46300979614463,
+      "prediction_mean": 232.2853863537573,
+      "prediction_max": 4428.209732893636
+    },
+    {
+      "week": 152,
+      "rows": 3242,
+      "prediction_min": 15.724625054817377,
+      "prediction_mean": 328.015210787073,
+      "prediction_max": 5641.334669635016
+    },
+    {
+      "week": 153,
+      "rows": 3268,
+      "prediction_min": 15.031313473355105,
+      "prediction_mean": 284.87874717718773,
+      "prediction_max": 7050.183584738703
+    },
+    {
+      "week": 154,
+      "rows": 3228,
+      "prediction_min": 13.887118311686562,
+      "prediction_mean": 236.6621600522725,
+      "prediction_max": 4412.833827633626
+    },
+    {
+      "week": 155,
+      "rows": 3178,
+      "prediction_min": 12.88200791763531,
+      "prediction_mean": 198.50914793590312,
+      "prediction_max": 4894.539012481338
+    }
+  ],
+  "recursive_features": [
+    "num_orders_lag_1",
+    "num_orders_lag_4",
+    "num_orders_roll_mean_4"
+  ],
+  "submission_path": "submissions/final_submission.csv"
+}
