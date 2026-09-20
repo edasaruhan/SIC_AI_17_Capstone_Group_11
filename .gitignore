@@ -4,3 +4,14 @@ __pycache__/
 .ipynb_checkpoints/
 *.pyc
 .venv/
+.env
+**/.env
+.DS_Store
+__MACOSX/
+.pytest_cache/
+.coverage
+htmlcov/
+.pip-audit-cache/
+deploy/logs/
+deploy/models/*.txt
+deploy/models/manifest.json

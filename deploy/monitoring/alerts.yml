@@ -1,0 +1,29 @@
+# Prometheus alert kurallari (prometheus.yml -> rule_files)
+groups:
+- name: food-demand-api
+  rules:
+  - alert: ApiDown
+    expr: up{job="food-demand-api"} == 0
+    for: 2m
+    labels: {severity: critical}
+    annotations: {summary: "API 2 dakikadir yanit vermiyor"}
+  - alert: HighErrorRate
+    expr: sum(rate(api_requests_total{status=~"5.."}[5m])) / sum(rate(api_requests_total[5m])) > 0.02
+    for: 5m
+    labels: {severity: critical}
+    annotations: {summary: "5xx orani %2 ustunde"}
+  - alert: SlowResponses
+    expr: histogram_quantile(0.95, sum(rate(api_request_latency_seconds_bucket[5m])) by (le)) > 1
+    for: 10m
+    labels: {severity: warning}
+    annotations: {summary: "p95 gecikme 1 saniyenin ustunde"}
+  - alert: AuthFailureSpike
+    expr: rate(auth_failures_total[5m]) > 0.5
+    for: 5m
+    labels: {severity: warning}
+    annotations: {summary: "Cok sayida gecersiz API key denemesi (brute-force olabilir)"}
+  - alert: HighColdStartShare
+    expr: rate(prediction_cold_start_total[1h]) / rate(api_requests_total{path=~"/predict.*"}[1h]) > 0.3
+    for: 1h
+    labels: {severity: warning}
+    annotations: {summary: "Tahminlerin %30'undan fazlasi gecmissiz (yeni yemek/merkez)"}

@@ -1,0 +1,25 @@
+{
+  "target_transform": "log1p (apply expm1 after prediction)",
+  "training_weeks": [1, 145],
+  "feature_columns": [
+    "checkout_price",
+    "base_price",
+    "discount_ratio",
+    "emailer_for_promotion",
+    "homepage_featured",
+    "num_orders_lag_1",
+    "num_orders_lag_4",
+    "num_orders_roll_mean_4",
+    "weekofyear",
+    "week_sin",
+    "week_cos",
+    "center_type_enc",
+    "category_enc",
+    "cuisine_enc",
+    "city_code",
+    "region_code",
+    "op_area",
+    "center_id",
+    "meal_id"
+  ]
+}

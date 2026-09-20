@@ -1,0 +1,7 @@
+fastapi>=0.110,<1
+uvicorn[standard]>=0.29,<1
+lightgbm>=4.6,<5
+numpy>=2.0,<3
+pandas>=2.2,<4
+prometheus-client>=0.20,<1
+pydantic>=2.6,<3

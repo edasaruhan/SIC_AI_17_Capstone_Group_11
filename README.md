@@ -23,6 +23,7 @@ Holdout sonucu, gerçek hedeflerin yalnızca değerlendirme için bulunduğu tek
 
 ```text
 data/                    Eğitilmiş modeller, encoder'lar ve deney sonuçları
+deploy/                  FastAPI, Docker, güvenlik ve monitoring paketi
 extensions/forecasting/ Leakage-aware doğrulama ve gerçek submission pipeline'ı
 notebooks/               Faz 1-4 notebook'ları ve yeniden üretim betikleri
 reports/                 Proje raporları, sonuç JSON'ları ve görseller
@@ -89,14 +90,37 @@ python extensions/forecasting/build_submission.py --data-dir data --output submi
 
 Bu komut haftalar 1-145 üzerindeki 456.548 etiketli satırla modeli eğitir ve haftalar 146-155 için 32.573 tahmin üretir. Submission kimlik sırası `sample_submission.csv` ile doğrulanır; eksik, tekrarlı veya negatif tahminler hata oluşturur.
 
+## Deployment
+
+Deployment artefaktlarını hazırlayıp API testlerini çalıştırın:
+
+```powershell
+python -m pip install -r deploy/requirements-dev.txt
+python deploy/scripts/export_artifacts.py
+python -m pytest deploy/tests -q
+```
+
+Docker imajı repository kökünden oluşturulur:
+
+```powershell
+docker build -f deploy/Dockerfile -t food-demand-api .
+docker run --rm -p 8000:8000 -e API_KEYS=local-demo-key food-demand-api
+```
+
+Çalışan servisin health endpoint'i `http://localhost:8000/health`, etkileşimli Swagger arayüzü ise `http://localhost:8000/docs` adresindedir. Ayrıntılar için `deploy/README.md` dosyasına bakın.
+
 ## Final Deliverables
 
 - `reports/Model Refinement and Test Submission.pdf`
 - `reports/Model Refinement and Test Submission.docx`
+- `reports/Deployment Documentation TR.pdf`
 - `reports/results/walk_forward_metrics.json`
 - `submissions/final_submission.csv`
 - `submissions/final_submission_manifest.json`
 - `data/final_submission_lgb_model.txt`
+- `deploy/README.md`
+- `deploy/Dockerfile`
+- `deploy/app/main.py`
 
 ## Methodology Notes
 

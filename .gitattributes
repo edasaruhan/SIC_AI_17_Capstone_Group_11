@@ -1,0 +1,7 @@
+data/*.txt -text
+deploy/models/*.txt -text
+*.png binary
+*.pdf binary
+*.docx binary
+*.pkl binary
+*.parquet binary

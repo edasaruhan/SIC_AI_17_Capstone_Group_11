@@ -1,0 +1,29 @@
+{
+  "center_type": {
+    "TYPE_A": 0,
+    "TYPE_B": 1,
+    "TYPE_C": 2
+  },
+  "category": {
+    "Beverages": 0,
+    "Biryani": 1,
+    "Desert": 2,
+    "Extras": 3,
+    "Fish": 4,
+    "Other Snacks": 5,
+    "Pasta": 6,
+    "Pizza": 7,
+    "Rice Bowl": 8,
+    "Salad": 9,
+    "Sandwich": 10,
+    "Seafood": 11,
+    "Soup": 12,
+    "Starters": 13
+  },
+  "cuisine": {
+    "Continental": 0,
+    "Indian": 1,
+    "Italian": 2,
+    "Thai": 3
+  }
+}
