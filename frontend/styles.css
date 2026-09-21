@@ -133,32 +133,6 @@ a { color: var(--primary); }
 
 .connection-banner p { margin: 2px 0 0; color: #6e491e; }
 
-.project-context {
-  margin-bottom: 24px;
-  padding: 15px 18px;
-  border: 1px solid #cfe1da;
-  border-left: 4px solid var(--primary);
-  border-radius: var(--radius);
-  background: #f4f9f7;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.project-context .context-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  color: var(--primary);
-  background: #dcece6;
-  font-weight: 800;
-}
-
-.project-context p { margin: 3px 0 0; color: var(--text-muted); line-height: 1.45; }
-
 .page-heading {
   margin-bottom: 22px;
   display: flex;
@@ -214,7 +188,6 @@ a { color: var(--primary); }
 
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field > span, .history-grid label > span { color: var(--text-muted); font-size: 12px; font-weight: 700; }
-.field > small { margin-top: -2px; color: #77827d; font-size: 10px; line-height: 1.3; }
 
 .field input, .field select, .history-grid input {
   width: 100%;
@@ -408,7 +381,6 @@ tbody tr:hover { background: #fafbfa; }
   .api-version { display: none; }
   .nav-button { flex: 1; padding: 0 6px; }
   .page-heading { align-items: flex-start; flex-direction: column; }
-  .project-context { padding: 14px; }
   .form-grid { grid-template-columns: 1fr 1fr; }
   .toggle-row { align-items: flex-start; flex-direction: column; gap: 10px; }
   .validation-grid { grid-template-columns: 1fr 1fr; }

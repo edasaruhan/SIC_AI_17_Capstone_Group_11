@@ -3,24 +3,6 @@
 const API_KEY_STORAGE = "food-demand-api-key";
 const HISTORY_STORAGE = "food-demand-session-history";
 
-const displayLabels = {
-  category: {
-    Beverages: "İçecek", Biryani: "Biryani", Desert: "Tatlı", Extras: "Ek ürün",
-    Fish: "Balık", "Other Snacks": "Diğer atıştırmalık", Pasta: "Makarna",
-    Pizza: "Pizza", "Rice Bowl": "Pilav kasesi", Salad: "Salata",
-    Sandwich: "Sandviç", Seafood: "Deniz ürünü", Soup: "Çorba", Starters: "Başlangıç",
-  },
-  cuisine: {
-    Continental: "Dünya mutfağı", Indian: "Hint mutfağı",
-    Italian: "İtalyan mutfağı", Thai: "Tayland mutfağı",
-  },
-  center_type: {
-    TYPE_A: "Tip A (veri seti kodu)",
-    TYPE_B: "Tip B (veri seti kodu)",
-    TYPE_C: "Tip C (veri seti kodu)",
-  },
-};
-
 const state = {
   apiKey: sessionStorage.getItem(API_KEY_STORAGE) || "",
   modelInfo: null,
@@ -108,8 +90,8 @@ async function readError(response) {
 
 async function apiFetch(path, options = {}) {
   if (!state.apiKey) {
-    openApiDialog("Devam etmek için bağlantı anahtarını girin.");
-    throw new Error("Bağlantı anahtarı girilmedi.");
+    openApiDialog("Devam etmek için API anahtarını girin.");
+    throw new Error("API anahtarı girilmedi.");
   }
   const headers = new Headers(options.headers || {});
   headers.set("X-API-Key", state.apiKey);
@@ -127,12 +109,12 @@ async function checkHealth() {
     if (!response.ok) throw new Error("Servis yanıt vermedi");
     const health = await response.json();
     badge.className = "status-badge";
-    label.textContent = health.status === "ok" ? "Sistem hazır" : "Sistem durumu belirsiz";
-    document.querySelector("#api-version").textContent = `Sürüm ${health.version}`;
+    label.textContent = health.status === "ok" ? "Model aktif" : "Model durumu belirsiz";
+    document.querySelector("#api-version").textContent = `API ${health.version}`;
   } catch {
     badge.className = "status-badge status-error";
-    label.textContent = "Sistem çevrimdışı";
-    document.querySelector("#api-version").textContent = "Sürüm —";
+    label.textContent = "Model çevrimdışı";
+    document.querySelector("#api-version").textContent = "API —";
   }
 }
 
@@ -158,7 +140,7 @@ function viewFromHash() {
 
 function updateConnectionBanner() {
   document.querySelector("#connection-banner").classList.toggle("hidden", Boolean(state.apiKey));
-  document.querySelector("#open-api-settings").textContent = state.apiKey ? "Sistem bağlı" : "Bağlantı ayarı";
+  document.querySelector("#open-api-settings").textContent = state.apiKey ? "API bağlı" : "API anahtarı";
 }
 
 function openApiDialog(message = "") {
@@ -177,7 +159,7 @@ async function saveApiKey() {
   const button = document.querySelector("#save-api-key");
   const candidate = input.value.trim();
   if (!candidate) {
-    showMessage(message, "Bağlantı anahtarı boş bırakılamaz.");
+    showMessage(message, "API anahtarı boş bırakılamaz.");
     return;
   }
   button.disabled = true;
@@ -189,7 +171,7 @@ async function saveApiKey() {
     sessionStorage.setItem(API_KEY_STORAGE, candidate);
     updateConnectionBanner();
     document.querySelector("#api-dialog").close();
-    showToast("Sistem bağlantısı doğrulandı.");
+    showToast("API bağlantısı doğrulandı.");
     await loadLiveMetrics();
   } catch (error) {
     state.apiKey = previous;
@@ -203,21 +185,21 @@ async function saveApiKey() {
 async function loadModelInfo() {
   const response = await apiFetch("/model-info", { cache: "no-store" });
   state.modelInfo = await response.json();
-  populateSelect("#category-select", state.modelInfo.categories.category, "Beverages", displayLabels.category);
-  populateSelect("#cuisine-select", state.modelInfo.categories.cuisine, "Italian", displayLabels.cuisine);
-  populateSelect("#center-type-select", state.modelInfo.categories.center_type, "TYPE_B", displayLabels.center_type);
+  populateSelect("#category-select", state.modelInfo.categories.category, "Beverages");
+  populateSelect("#cuisine-select", state.modelInfo.categories.cuisine, "Italian");
+  populateSelect("#center-type-select", state.modelInfo.categories.center_type, "TYPE_B");
   renderValidationMetrics();
   return state.modelInfo;
 }
 
-function populateSelect(selector, values, preferred, labels = {}) {
+function populateSelect(selector, values, preferred) {
   const select = document.querySelector(selector);
   const current = select.value;
   select.replaceChildren();
   values.forEach((value) => {
     const option = document.createElement("option");
     option.value = value;
-    option.textContent = labels[value] || value;
+    option.textContent = value;
     select.appendChild(option);
   });
   const desired = values.includes(current) ? current : values.includes(preferred) ? preferred : values[0];
@@ -267,12 +249,12 @@ async function submitPrediction(event) {
     saveSessionHistory();
     renderHistory();
     renderSessionChart();
-    showToast("Üretim önerisi hazırlandı.");
+    showToast("Tahmin başarıyla oluşturuldu.");
   } catch (error) {
     showMessage(message, error.message);
   } finally {
     button.disabled = false;
-    button.textContent = "Üretim önerisini hesapla";
+    button.textContent = "Tahmin oluştur";
   }
 }
 
@@ -304,12 +286,12 @@ function renderPrediction(request, result) {
   const notice = document.querySelector("#result-notice");
   if (result.warnings?.length) {
     notice.className = "result-notice warning";
-    notice.querySelector("strong").textContent = "Sipariş geçmişi yetersiz";
-    notice.querySelector("p").textContent = "Dört haftadan az veri olduğu için üretim kararını işletme koşullarıyla birlikte değerlendirin.";
+    notice.querySelector("strong").textContent = "Sınırlı geçmiş verisi";
+    notice.querySelector("p").textContent = "Dört haftadan az geçmiş verildiği için tahmin belirsizliği daha yüksek olabilir.";
   } else {
     notice.className = "result-notice success";
-    notice.querySelector("strong").textContent = "Son haftaların verisi yeterli";
-    notice.querySelector("p").textContent = "Öneri, girdiğiniz dört haftalık gerçek sipariş geçmişine göre hazırlandı.";
+    notice.querySelector("strong").textContent = "Geçmiş sipariş verisi yeterli";
+    notice.querySelector("p").textContent = "Lag ve hareketli ortalama özellikleri son dört haftadan hesaplandı.";
   }
 }
 
@@ -489,7 +471,7 @@ function renderBatchTable() {
     createCell(row, String(item.request.week || "—"));
     createCell(row, String(item.request.center_id ?? "—"));
     createCell(row, String(item.request.meal_id ?? "—"));
-    createCell(row, displayLabels.category[item.request.category] || item.request.category || "—");
+    createCell(row, item.request.category || "—");
     createCell(row, item.result ? `${formatNumber(item.result.predicted_orders, 2)} pors.` : "—");
     createCell(row, item.result ? `${formatNumber(item.result.p_low, 0)} – ${formatNumber(item.result.p_high, 0)}` : "—");
     const status = row.insertCell();
@@ -516,12 +498,12 @@ async function runBatch() {
     state.batchResults = validRows;
     document.querySelector("#export-batch").disabled = false;
     renderBatchTable();
-    showToast(`${payload.count} yemek için üretim önerisi hazırlandı.`);
+    showToast(`${payload.count} tahmin başarıyla hesaplandı.`);
   } catch (error) {
     showToast(error.message, "error");
   } finally {
     button.disabled = false;
-    button.textContent = "Kontrol et ve planı oluştur";
+    button.textContent = "Doğrula ve tahmin et";
   }
 }
 
@@ -593,9 +575,9 @@ function renderValidationMetrics() {
   const chart = document.querySelector("#validation-chart");
   chart.replaceChildren();
   const rows = [
-    ["Son dönem modeli", metrics.holdout_rmsle, false],
-    ["Üç dönem ortalaması", metrics.walk_forward_rmsle, false],
-    ["Sadece geçen haftayı kullanan basit yöntem", metrics.persistence_rmsle, true],
+    ["Holdout model", metrics.holdout_rmsle, false],
+    ["Walk-forward model", metrics.walk_forward_rmsle, false],
+    ["Persistence referansı", metrics.persistence_rmsle, true],
   ];
   const maximum = Math.max(...rows.map((row) => row[1])) * 1.08;
   rows.forEach(([label, value, reference]) => {
