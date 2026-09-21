@@ -1,8 +1,9 @@
 # Deployment
 
 Bu klasör, eğitilmiş LightGBM modellerini FastAPI üzerinden nokta tahmini ve
-kalibre tahmin aralığı üreten bir servise dönüştürür. Özel bir frontend yoktur;
-etkileşimli API arayüzü `/docs` adresindeki Swagger UI'dır.
+kalibre tahmin aralığı üreten bir servise dönüştürür. Servis aynı zamanda
+`frontend/` altındaki operasyon panelini kök adreste sunar. Swagger API
+dokümantasyonu `/docs` adresinde kalır.
 
 ## Yerel kurulum
 
@@ -18,12 +19,15 @@ python -m uvicorn deploy.app.main:app --port 8000
 
 Kontrol adresleri:
 
+- `http://localhost:8000/` (operasyon paneli)
 - `http://localhost:8000/health`
 - `http://localhost:8000/docs`
 - `http://localhost:8000/metrics` (`X-API-Key` gerekir)
 
 API anahtarlarını yalnızca ortam değişkeninde veya platformun secret deposunda
-tutun. `.env` dosyası Git'e eklenmez.
+tutun. `.env` dosyası Git'e eklenmez. Frontend API anahtarını kaynak koda
+gömmez; kullanıcıdan alır ve yalnızca tarayıcı sekmesinin `sessionStorage`
+alanında saklar.
 
 ## Docker
 

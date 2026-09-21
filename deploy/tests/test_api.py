@@ -53,6 +53,16 @@ def test_health_open():
     assert response.json()["status"] == "ok"
 
 
+def test_frontend_shell_and_assets_are_served():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "Yemek Talep Tahmini" in response.text
+    assert client.get("/frontend/styles.css").status_code == 200
+    script = client.get("/frontend/app.js")
+    assert script.status_code == 200
+    assert "local-demo-key" not in script.text  # API anahtari kaynak koda gomulmez
+
+
 def test_auth_required():
     assert client.post("/predict", json=PAYLOAD).status_code == 401
     assert client.post("/predict", json=PAYLOAD, headers={"X-API-Key": "wrong"}).status_code == 401
