@@ -56,7 +56,7 @@ def test_health_open():
 def test_frontend_shell_and_assets_are_served():
     response = client.get("/")
     assert response.status_code == 200
-    assert "Yemek Talep Tahmini" in response.text
+    assert "Yemek Üretim Planlama" in response.text
     assert client.get("/frontend/styles.css").status_code == 200
     script = client.get("/frontend/app.js")
     assert script.status_code == 200
