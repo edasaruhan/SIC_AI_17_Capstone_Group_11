@@ -20,14 +20,11 @@ import numpy as np
 import pandas as pd
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, Security
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
 from fastapi.security.api_key import APIKeyHeader
-from fastapi.staticfiles import StaticFiles
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 from pydantic import BaseModel, Field
 
 MODEL_DIR = Path(os.getenv("MODEL_DIR", Path(__file__).resolve().parents[1] / "models"))
-FRONTEND_DIR = Path(os.getenv("FRONTEND_DIR", Path(__file__).resolve().parents[2] / "frontend"))
 PRED_LOG = Path(os.getenv("PREDICTION_LOG", "logs/predictions.jsonl"))
 API_KEYS = {k.strip() for k in os.getenv("API_KEYS", "").split(",") if k.strip()}
 RATE_LIMIT_PER_MIN = int(os.getenv("RATE_LIMIT_PER_MIN", "120"))
@@ -261,16 +258,3 @@ def predict_batch(body: List[DemandRequest], request: Request):
 @app.get("/metrics", dependencies=[Depends(verify_key)])
 def metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
-
-
-# Frontend mount'u API rotalarindan sonra eklenir; boylece /docs, /health ve
-# tahmin endpointleri statik dosya servisi tarafindan golgelenmez.
-if FRONTEND_DIR.is_dir():
-    @app.get("/", include_in_schema=False)
-    def frontend_index():
-        return FileResponse(
-            FRONTEND_DIR / "index.html",
-            headers={"Cache-Control": "no-store"},
-        )
-
-    app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR), name="frontend")

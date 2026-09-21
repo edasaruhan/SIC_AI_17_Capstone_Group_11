@@ -13,6 +13,5 @@ __MACOSX/
 htmlcov/
 .pip-audit-cache/
 deploy/logs/
-logs/
 deploy/models/*.txt
 deploy/models/manifest.json

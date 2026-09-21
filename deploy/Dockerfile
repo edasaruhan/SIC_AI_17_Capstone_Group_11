@@ -2,8 +2,7 @@ FROM python:3.12.11-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    FRONTEND_DIR=/srv/frontend
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libgomp1 \
@@ -16,7 +15,6 @@ RUN pip install --no-cache-dir --no-compile -r /tmp/requirements.txt
 
 COPY deploy/app/ app/
 COPY deploy/scripts/ scripts/
-COPY frontend/ frontend/
 COPY deploy/models/category_maps.json deploy/models/model_spec.json models/
 COPY data/final_submission_lgb_model.txt \
      data/quantile_final_p8.txt \

@@ -24,7 +24,6 @@ Holdout sonucu, gerçek hedeflerin yalnızca değerlendirme için bulunduğu tek
 ```text
 data/                    Eğitilmiş modeller, encoder'lar ve deney sonuçları
 deploy/                  FastAPI, Docker, güvenlik ve monitoring paketi
-frontend/                Tekli/toplu tahmin ve izleme web arayüzü
 extensions/forecasting/ Leakage-aware doğrulama ve gerçek submission pipeline'ı
 notebooks/               Faz 1-4 notebook'ları ve yeniden üretim betikleri
 reports/                 Proje raporları, sonuç JSON'ları ve görseller
@@ -108,11 +107,7 @@ docker build -f deploy/Dockerfile -t food-demand-api .
 docker run --rm -p 8000:8000 -e API_KEYS=local-demo-key food-demand-api
 ```
 
-Çalışan web arayüzü `http://localhost:8000/`, health endpoint'i
-`http://localhost:8000/health`, etkileşimli Swagger arayüzü ise
-`http://localhost:8000/docs` adresindedir. Arayüz ilk kullanımda Docker'a
-verilen `API_KEYS` değerlerinden birini ister. Ayrıntılar için
-`deploy/README.md` dosyasına bakın.
+Çalışan servisin health endpoint'i `http://localhost:8000/health`, etkileşimli Swagger arayüzü ise `http://localhost:8000/docs` adresindedir. Ayrıntılar için `deploy/README.md` dosyasına bakın.
 
 ## Final Deliverables
 
