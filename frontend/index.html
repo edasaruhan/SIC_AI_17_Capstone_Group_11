@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Merkezi mutfaklar için haftalık yemek üretim planlama paneli">
+  <title>Yemek Üretim Planlama</title>
+  <link rel="stylesheet" href="/frontend/styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-row">
+        <a class="brand" href="#tekli" aria-label="Yemek Üretim Planlama ana sayfa">Yemek Üretim Planlama</a>
+        <span class="status-badge status-checking" id="health-badge">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="health-label">Sistem kontrol ediliyor</span>
+        </span>
+      </div>
+      <nav class="main-nav" aria-label="Ana navigasyon">
+        <button class="nav-button active" data-view="single" type="button">Üretim Planı</button>
+        <button class="nav-button" data-view="quick" type="button">Saha Ekranı</button>
+        <button class="nav-button" data-view="batch" type="button">Toplu Planlama</button>
+        <button class="nav-button" data-view="monitoring" type="button">Performans</button>
+      </nav>
+      <div class="header-actions">
+        <span class="api-version" id="api-version">Sürüm —</span>
+        <button class="button button-secondary button-small" id="open-api-settings" type="button">Bağlantı ayarı</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <div class="connection-banner hidden" id="connection-banner" role="status">
+      <div>
+        <strong>Sistem bağlantısı için anahtar gerekli</strong>
+        <p>Üretim planlama ekranlarını kullanmak için size verilen bağlantı anahtarını girin.</p>
+      </div>
+      <button class="button button-primary button-small" id="banner-api-settings" type="button">Bağlantıyı kur</button>
+    </div>
+
+    <section class="project-context" aria-label="Projenin kullanım alanı">
+      <span class="context-icon" aria-hidden="true">◎</span>
+      <div>
+        <strong>Merkezi mutfaklar için yemek üretim planlaması</strong>
+        <p>Merkezi mutfak, catering ve yemek dağıtım merkezlerinin gelecek hafta kaç porsiyon hazırlaması gerektiğini tahmin ederek fazla üretimi ve gıda israfını azaltır.</p>
+      </div>
+    </section>
+
+    <section class="view" id="single-view" aria-labelledby="single-title">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">Haftalık yemek üretim planı</p>
+          <h1 id="single-title">Gelecek hafta kaç porsiyon hazırlamalıyız?</h1>
+          <p>Bir üretim noktası ve yemek seçerek gelecek haftanın beklenen sipariş miktarını hesaplayın.</p>
+        </div>
+        <span class="cycle-label">Tek haftalık tahmin</span>
+      </div>
+
+      <div class="prediction-layout">
+        <section class="panel form-panel" aria-labelledby="prediction-input-title">
+          <div class="panel-heading">
+            <div>
+              <h2 id="prediction-input-title">Planlama bilgileri</h2>
+              <p>Yemeğin satış, kampanya ve son haftalardaki sipariş bilgilerini girin.</p>
+            </div>
+          </div>
+
+          <form id="prediction-form" novalidate>
+            <div class="form-grid">
+              <label class="field">
+                <span>Planlanacak hafta</span>
+                <input name="week" type="number" min="1" max="520" value="136" required>
+                <small>Veri setindeki hafta numarası</small>
+              </label>
+              <label class="field">
+                <span>Üretim noktası numarası</span>
+                <input name="center_id" type="number" min="0" value="10" required>
+                <small>Merkezi mutfak veya dağıtım merkezi kodu</small>
+              </label>
+              <label class="field">
+                <span>Yemek numarası</span>
+                <input name="meal_id" type="number" min="0" value="1062" required>
+                <small>Menüdeki yemeğin kayıt kodu</small>
+              </label>
+              <label class="field">
+                <span>İndirimli satış fiyatı</span>
+                <input name="checkout_price" type="number" min="0.01" max="10000" step="0.01" value="194.06" required>
+              </label>
+              <label class="field">
+                <span>Normal liste fiyatı</span>
+                <input name="base_price" type="number" min="0.01" max="10000" step="0.01" value="194.06" required>
+              </label>
+              <label class="field">
+                <span>Yemek kategorisi</span>
+                <select name="category" id="category-select" required>
+                  <option value="Beverages">Beverages</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Mutfak türü</span>
+                <select name="cuisine" id="cuisine-select" required>
+                  <option value="Italian">Italian</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Üretim noktası türü</span>
+                <select name="center_type" id="center-type-select" required>
+                  <option value="TYPE_B">TYPE_B</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Hizmet alanı (km²)</span>
+                <input name="op_area" type="number" min="0.01" max="100" step="0.01" value="6.3" required>
+              </label>
+              <label class="field">
+                <span>Şehir kodu</span>
+                <input name="city_code" type="number" min="0" value="590" required>
+                <small>Veri setindeki şehir kodu</small>
+              </label>
+              <label class="field">
+                <span>Bölge kodu</span>
+                <input name="region_code" type="number" min="0" value="56" required>
+                <small>Veri setindeki operasyon bölgesi kodu</small>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <label class="check-field">
+                <input name="emailer_for_promotion" type="checkbox">
+                <span>E-posta kampanyası var</span>
+              </label>
+              <label class="check-field">
+                <input name="homepage_featured" type="checkbox">
+                <span>Yemek ana sayfada öne çıkarıldı</span>
+              </label>
+            </div>
+
+            <fieldset class="history-fieldset">
+              <legend>Son dört haftanın sipariş miktarları</legend>
+              <p>Her hafta satılan gerçek porsiyon sayısını girin.</p>
+              <div class="history-grid">
+                <label><span>4 hafta önce</span><input name="history_1" type="number" min="0" value="1538" required></label>
+                <label><span>3 hafta önce</span><input name="history_2" type="number" min="0" value="700" required></label>
+                <label><span>2 hafta önce</span><input name="history_3" type="number" min="0" value="704" required></label>
+                <label><span>Geçen hafta</span><input name="history_4" type="number" min="0" value="960" required></label>
+              </div>
+            </fieldset>
+
+            <div class="form-message hidden" id="single-form-message" role="alert"></div>
+            <div class="form-actions">
+              <button class="button button-primary" id="predict-button" type="submit">Üretim önerisini hesapla</button>
+              <button class="button button-link" data-view-link="batch" type="button">Birden fazla yemek planla</button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="panel result-panel" aria-labelledby="prediction-result-title">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Üretim önerisi</p>
+              <h2 id="prediction-result-title">Gelecek hafta planı</h2>
+            </div>
+            <span class="band-badge">Tahmini aralık</span>
+          </div>
+
+          <div class="empty-state" id="result-empty">
+            <span class="empty-icon" aria-hidden="true">↗</span>
+            <strong>Henüz üretim önerisi oluşturulmadı</strong>
+            <p>Bilgileri gönderdiğinizde önerilen porsiyon miktarı ve güvenli planlama aralığı burada görünecek.</p>
+          </div>
+
+          <div class="hidden" id="result-content">
+            <div class="result-number-row">
+              <div>
+                <span>Önerilen hazırlık miktarı</span>
+                <strong><span id="predicted-orders">—</span> <small>porsiyon</small></strong>
+              </div>
+              <span class="result-comparison" id="result-comparison">—</span>
+            </div>
+
+            <div class="range-card">
+              <div class="range-labels">
+                <span>Düşük talep <strong id="p-low">—</strong></span>
+                <span>Beklenen <strong id="p-median">—</strong></span>
+                <span>Yüksek talep <strong id="p-high">—</strong></span>
+              </div>
+              <div class="range-track" aria-label="Beklenen sipariş aralığı">
+                <span class="range-band" id="range-band"></span>
+                <span class="range-marker" id="range-marker" title="Noktasal tahmin"></span>
+              </div>
+            </div>
+
+            <div class="result-notice success" id="result-notice">
+              <strong>Son haftaların verisi yeterli</strong>
+              <p>Öneri, girdiğiniz dört haftalık gerçek sipariş geçmişine göre hazırlandı.</p>
+            </div>
+
+            <dl class="result-meta">
+              <div><dt>Hesaplama sürümü</dt><dd id="model-version">—</dd></div>
+              <div><dt>Hesaplama zamanı</dt><dd id="calculated-at">—</dd></div>
+            </dl>
+          </div>
+        </aside>
+      </div>
+
+      <section class="panel history-panel" aria-labelledby="history-title">
+        <div class="panel-heading table-heading">
+          <div>
+            <h2 id="history-title">Son üretim önerileri</h2>
+            <p>Bu liste yalnızca açık tarayıcı sekmesi boyunca tutulur.</p>
+          </div>
+          <button class="button button-secondary button-small" id="export-history" type="button" disabled>CSV dışa aktar</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Hafta</th><th>Üretim noktası</th><th>Yemek</th><th>Önerilen porsiyon</th><th>Beklenen aralık</th><th>Durum</th></tr></thead>
+            <tbody id="history-body"><tr class="empty-row"><td colspan="6">Bu oturumda henüz tahmin yapılmadı.</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section class="view hidden" id="quick-view" aria-labelledby="quick-title">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">Mobil kullanım demosu</p>
+          <h1 id="quick-title">Yemek koduyla hızlı üretim planı</h1>
+          <p>Yemek kodu ve son dört haftanın siparişleriyle gelecek haftanın beklenen porsiyon talebini hesaplayın.</p>
+        </div>
+        <span class="cycle-label">Canlı model sonucu</span>
+      </div>
+
+      <div class="quick-layout">
+        <section class="quick-workspace" aria-labelledby="quick-form-title">
+          <div class="quick-hero">
+            <div class="quick-hero-top"><span class="quick-signal" aria-hidden="true"></span><span>Kodla hızlı giriş</span><span class="quick-demo-tag">DEMO</span></div>
+            <div class="quick-focus" aria-hidden="true"><span></span><strong>YEMEK KODU</strong><span></span></div>
+            <p>Bu demo kodu elle alır. Kamera veya barkod okuyucu bağlantısı bulunmuyor.</p>
+          </div>
+
+          <form id="quick-form" class="quick-form" novalidate>
+            <div class="quick-form-heading">
+              <div><p class="eyebrow">Planlama girdileri</p><h2 id="quick-form-title">Yemeği ve geçmiş siparişleri girin</h2></div>
+              <button class="button button-secondary button-small" id="quick-example" type="button">Örnek veriyi yükle</button>
+            </div>
+            <div class="quick-fields">
+              <label class="field"><span>Yemek kodu</span><input name="meal_id" type="number" min="0" value="1062" required inputmode="numeric"><small>Menüdeki yemeğin kayıt kodu</small></label>
+              <label class="field"><span>Üretim noktası kodu</span><input name="center_id" type="number" min="0" value="10" required inputmode="numeric"><small>Merkezi mutfak veya dağıtım merkezi</small></label>
+              <label class="field"><span>Planlanacak hafta</span><input name="week" type="number" min="1" max="520" value="136" required inputmode="numeric"><small>Veri setindeki hafta numarası</small></label>
+              <label class="field"><span>Satış fiyatı (₺)</span><input name="checkout_price" type="number" min="0.01" max="10000" step="0.01" value="194.06" required inputmode="decimal"></label>
+              <label class="field"><span>Liste fiyatı (₺)</span><input name="base_price" type="number" min="0.01" max="10000" step="0.01" value="194.06" required inputmode="decimal"></label>
+            </div>
+            <fieldset class="history-fieldset quick-history">
+              <legend>Son dört haftanın gerçek siparişleri</legend>
+              <p>Aynı üretim noktası ve yemek için, eskiden yeniye porsiyon sayıları.</p>
+              <div class="history-grid">
+                <label><span>4 hafta önce</span><input name="history_1" type="number" min="0" value="1538" required inputmode="numeric"></label>
+                <label><span>3 hafta önce</span><input name="history_2" type="number" min="0" value="700" required inputmode="numeric"></label>
+                <label><span>2 hafta önce</span><input name="history_3" type="number" min="0" value="704" required inputmode="numeric"></label>
+                <label><span>Geçen hafta</span><input name="history_4" type="number" min="0" value="960" required inputmode="numeric"></label>
+              </div>
+            </fieldset>
+            <details class="quick-details">
+              <summary>Modelin kullandığı diğer bilgileri düzenle <span>kategori, mutfak, bölge ve kampanya</span></summary>
+              <div class="quick-fields">
+                <label class="field"><span>Yemek kategorisi</span><select name="category" id="quick-category-select" required><option value="Beverages">İçecek</option></select></label>
+                <label class="field"><span>Mutfak türü</span><select name="cuisine" id="quick-cuisine-select" required><option value="Italian">İtalyan mutfağı</option></select></label>
+                <label class="field"><span>Üretim noktası türü</span><select name="center_type" id="quick-center-type-select" required><option value="TYPE_B">Tip B (veri seti kodu)</option></select></label>
+                <label class="field"><span>Şehir kodu</span><input name="city_code" type="number" min="0" value="590" required></label>
+                <label class="field"><span>Bölge kodu</span><input name="region_code" type="number" min="0" value="56" required></label>
+                <label class="field"><span>Hizmet alanı (km²)</span><input name="op_area" type="number" min="0.01" max="100" step="0.01" value="6.3" required></label>
+              </div>
+              <div class="toggle-row">
+                <label class="check-field"><input name="emailer_for_promotion" type="checkbox"><span>E-posta kampanyası var</span></label>
+                <label class="check-field"><input name="homepage_featured" type="checkbox"><span>Yemek ana sayfada öne çıkarıldı</span></label>
+              </div>
+            </details>
+            <div class="form-message hidden" id="quick-form-message" role="alert"></div>
+            <button class="button button-primary quick-submit" id="quick-predict-button" type="submit">Gelecek haftayı hesapla</button>
+          </form>
+        </section>
+
+        <aside class="quick-aside" aria-labelledby="quick-result-title">
+          <div class="quick-result-card">
+            <div class="quick-result-heading"><div><p class="eyebrow">Üretim planı</p><h2 id="quick-result-title">Gelecek hafta önerisi</h2></div><span class="band-badge">Model tahmini</span></div>
+            <div id="quick-result-empty" class="quick-result-empty">Formu gönderdiğinizde modelin hesapladığı porsiyon miktarı burada görünecek.</div>
+            <div id="quick-result-content" class="hidden" aria-live="polite">
+              <div class="quick-prediction"><strong id="quick-predicted-orders">—</strong><span>beklenen sipariş (porsiyon)</span></div>
+              <div class="quick-range"><span>Beklenen talep aralığı</span><strong><span id="quick-p-low">—</span> – <span id="quick-p-high">—</span> porsiyon</strong></div>
+              <p class="quick-compare" id="quick-comparison">—</p>
+              <p class="quick-result-note">Bu talep tahminidir; hazırlık miktarını belirlerken mutfak kapasitesini de değerlendirin.</p>
+              <p class="quick-warning hidden" id="quick-warning"></p>
+              <p class="quick-version" id="quick-version">—</p>
+            </div>
+          </div>
+          <div class="quick-recent-card">
+            <div><h2>Bu oturumdaki son hesaplamalar</h2><p>Yalnızca bu tarayıcı sekmesinde tutulur.</p></div>
+            <ul id="quick-recent-list"><li>Henüz tahmin yapılmadı.</li></ul>
+            <button class="button button-link" data-view-link="single" type="button">Ayrıntılı üretim planını aç →</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="view hidden" id="batch-view" aria-labelledby="batch-title">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">Birden fazla yemek için planlama</p>
+          <h1 id="batch-title">Toplu üretim planı</h1>
+          <p>Excel’den kaydettiğiniz CSV dosyasıyla en fazla 500 yemek için porsiyon önerisi oluşturun.</p>
+        </div>
+        <button class="button button-secondary" id="download-sample" type="button">Örnek CSV indir</button>
+      </div>
+
+      <div class="batch-top-grid">
+        <section class="panel upload-panel" aria-labelledby="upload-title">
+          <h2 id="upload-title">CSV dosyası</h2>
+          <label class="drop-zone" id="drop-zone">
+            <input id="batch-file" type="file" accept=".csv,text/csv">
+            <span class="upload-icon" aria-hidden="true">↑</span>
+            <strong>CSV dosyasını seçin veya buraya bırakın</strong>
+            <small>UTF-8, başlık satırı zorunlu, en fazla 500 kayıt</small>
+          </label>
+          <div class="file-summary hidden" id="file-summary"></div>
+        </section>
+
+        <section class="panel batch-action-panel" aria-labelledby="batch-action-title">
+          <h2 id="batch-action-title">Üretim planını hazırla</h2>
+          <p>Geçerli her yemek için önerilen porsiyon ve beklenen talep aralığı hesaplanır.</p>
+          <button class="button button-primary button-wide" id="run-batch" type="button" disabled>Kontrol et ve planı oluştur</button>
+          <button class="button button-secondary button-wide" id="clear-batch" type="button" disabled>Dosyayı temizle</button>
+        </section>
+      </div>
+
+      <section class="validation-grid" aria-label="CSV doğrulama özeti">
+        <div class="metric-card"><span>Toplam satır</span><strong id="total-row-count">0</strong><small>CSV içindeki kayıtlar</small></div>
+        <div class="metric-card metric-success"><span>Geçerli</span><strong id="valid-row-count">0</strong><small>Planlamaya hazır</small></div>
+        <div class="metric-card metric-warning"><span>Uyarılı</span><strong id="warning-row-count">0</strong><small>Dört haftadan az geçmiş</small></div>
+        <div class="metric-card metric-error"><span>Geçersiz</span><strong id="invalid-row-count">0</strong><small>Düzeltilmesi gereken</small></div>
+      </section>
+
+      <section class="panel batch-results-panel" aria-labelledby="batch-results-title">
+        <div class="panel-heading table-heading">
+          <div>
+            <h2 id="batch-results-title">Toplu üretim önerileri</h2>
+            <p id="batch-table-description">Dosya seçildiğinde doğrulama sonucu burada gösterilir.</p>
+          </div>
+          <button class="button button-secondary button-small" id="export-batch" type="button" disabled>Sonuçları CSV indir</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Satır</th><th>Hafta</th><th>Üretim noktası</th><th>Yemek</th><th>Kategori</th><th>Önerilen porsiyon</th><th>Beklenen aralık</th><th>Durum</th></tr></thead>
+            <tbody id="batch-body"><tr class="empty-row"><td colspan="8">Henüz CSV dosyası seçilmedi.</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section class="view hidden" id="monitoring-view" aria-labelledby="monitoring-title">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">Geçmiş sonuçlar ve sistem durumu</p>
+          <h1 id="monitoring-title">Tahmin performansı</h1>
+          <p>Modelin geçmiş haftalardaki başarısını ve sistemin çalışma durumunu sade bir özetle izleyin.</p>
+        </div>
+        <button class="button button-secondary" id="refresh-monitoring" type="button">Metrikleri yenile</button>
+      </div>
+
+      <section class="validation-grid" aria-label="Tahmin performansı özeti">
+        <div class="metric-card"><span>Son dönem hata puanı</span><strong id="holdout-rmsle">—</strong><small>Düşük değer daha iyi</small></div>
+        <div class="metric-card"><span>Genel hata puanı</span><strong id="walk-rmsle">—</strong><small>Üç geçmiş dönem testi</small></div>
+        <div class="metric-card"><span>Basit yöntemin hata puanı</span><strong id="persistence-rmsle">—</strong><small>Karşılaştırma değeri</small></div>
+        <div class="metric-card metric-success"><span>Tahmin aralığının başarısı</span><strong id="band-coverage">—</strong><small>Gerçek siparişi aralıkta yakalama oranı</small></div>
+      </section>
+
+      <div class="monitoring-grid">
+        <section class="panel chart-panel" aria-labelledby="validation-chart-title">
+          <div class="panel-heading">
+            <div>
+              <h2 id="validation-chart-title">Tahmin yöntemi karşılaştırması</h2>
+              <p>Kısa çubuk daha düşük hata ve daha iyi tahmin anlamına gelir.</p>
+            </div>
+            <span class="demo-label">Doğrulama verisi</span>
+          </div>
+          <div class="bar-chart" id="validation-chart" role="img" aria-label="Tahmin hata puanı karşılaştırma grafiği"></div>
+        </section>
+
+        <section class="panel live-metrics-panel" aria-labelledby="live-metrics-title">
+          <div class="panel-heading">
+            <div>
+              <h2 id="live-metrics-title">Sistem durumu</h2>
+              <p>Teknik ekip için temel kullanım ve hata sayaçları.</p>
+            </div>
+          </div>
+          <dl class="live-metric-list">
+            <div><dt>Toplam işlem</dt><dd id="request-total">—</dd></div>
+            <div><dt>Geçmişi olmayan tahmin</dt><dd id="cold-start-total">—</dd></div>
+            <div><dt>Hatalı giriş denemesi</dt><dd id="auth-failure-total">—</dd></div>
+            <div><dt>Çok sık istek</dt><dd id="rate-limited-total">—</dd></div>
+          </dl>
+          <p class="monitoring-note" id="monitoring-note">Bağlantı anahtarı girildiğinde sistem bilgileri yüklenir.</p>
+        </section>
+      </div>
+
+      <section class="panel session-chart-panel" aria-labelledby="session-chart-title">
+        <div class="panel-heading">
+          <div>
+            <h2 id="session-chart-title">Bu oturumdaki üretim önerileri</h2>
+            <p>Önerilen porsiyonlar ve beklenen talep aralığı gösterilir; bunlar gerçekleşen satışlar değildir.</p>
+          </div>
+          <span class="demo-label" id="session-count">0 tahmin</span>
+        </div>
+        <div class="session-chart" id="session-chart" role="img" aria-label="Oturumdaki tahmin eğilimi">
+          <p class="empty-chart">Grafik için en az iki tahmin oluşturun.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>SIC AI 17 · Grup 11</span>
+    <a href="/docs">API dokümantasyonu</a>
+  </footer>
+
+  <dialog class="api-dialog" id="api-dialog" aria-labelledby="api-dialog-title">
+    <form method="dialog" id="api-key-form">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">Bağlantı ayarları</p>
+          <h2 id="api-dialog-title">Sistem bağlantısı</h2>
+        </div>
+        <button class="icon-button" value="cancel" aria-label="Kapat" type="submit">×</button>
+      </div>
+      <p>Anahtar yalnızca bu tarayıcı sekmesinin oturum belleğinde tutulur; kaynak koda veya diske yazılmaz.</p>
+      <label class="field">
+        <span>Bağlantı anahtarı</span>
+        <input id="api-key-input" type="password" autocomplete="off" placeholder="Size verilen anahtarı girin" required>
+      </label>
+      <div class="form-message hidden" id="api-key-message" role="alert"></div>
+      <div class="dialog-actions">
+        <button class="button button-secondary" value="cancel" type="submit">Vazgeç</button>
+        <button class="button button-primary" id="save-api-key" type="button">Kaydet ve bağlantıyı doğrula</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <script src="/frontend/app.js" defer></script>
+</body>
+</html>

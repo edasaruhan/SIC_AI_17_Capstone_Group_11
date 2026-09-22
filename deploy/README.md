@@ -1,8 +1,11 @@
 # Deployment
 
 Bu klasör, eğitilmiş LightGBM modellerini FastAPI üzerinden nokta tahmini ve
-kalibre tahmin aralığı üreten bir servise dönüştürür. Özel bir frontend yoktur;
-etkileşimli API arayüzü `/docs` adresindeki Swagger UI'dır.
+kalibre tahmin aralığı üreten bir servise dönüştürür. Yerel demo arayüzü `/`
+adresinden, etkileşimli API arayüzü `/docs` adresinden açılır. Saha Ekranı,
+mobil tasarımın merkezi mutfaklara uyarlanmış halidir: yemek kodu ve gerçek
+haftalık siparişler girildiğinde `/predict` sonucunu gösterir. Kamera/barkod,
+stok yönetimi ve elektronik raf etiketi bağlantısı bu projede yoktur.
 
 ## Yerel kurulum
 
@@ -19,6 +22,7 @@ python -m uvicorn deploy.app.main:app --port 8000
 Kontrol adresleri:
 
 - `http://localhost:8000/health`
+- `http://localhost:8000/#saha` (mobil saha demosu)
 - `http://localhost:8000/docs`
 - `http://localhost:8000/metrics` (`X-API-Key` gerekir)
 
